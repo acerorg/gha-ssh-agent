@@ -1,0 +1,37 @@
+name: 'Waiter'
+description: 'Waiting for the command to become expected response within a max attempt loop'
+
+inputs:
+  delay:
+    description: 'Delay in seconds (sleep time)'
+    default: '1'
+    required: True
+  max_attempts:
+    description: 'Max attempts for the waiting loop'
+    default: '2'
+    required: True
+  expected_result:
+    description: 'Expected result for the waiter'
+    required: True
+  checker_cmd:
+    description: 'The command to check for status result'
+    required: True
+
+runs:
+  using: "composite"
+  steps:
+    - name: Wait
+      shell: bash
+      run: |
+          ready=0
+          for i in {1..${{ inputs.max_attempts }}}; do
+            echo -n "Checking ${i} of ${{ inputs.max_attempts }}... => "
+            result="$(${{ inputs.checker_cmd }})"
+            echo -n "Expecting: \"${{ inputs.expected_result }}\", Currently: \"${result}\"... "
+            if [[ "${result}" != "${{ inputs.expected_result }}" ]]; then
+              echo "Wait ${{ inputs.delay }} more second(s)..."; sleep ${{ inputs.delay }};
+            else
+              ready=1; break;
+            fi
+          done
+          [[ "${ready}" == "0" ]] && echo "Waiter timeout." && exit 1 || echo "Ready."
