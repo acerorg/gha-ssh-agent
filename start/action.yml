@@ -1,0 +1,32 @@
+name: 'SSH Agent Start'
+description: 'SSH Agent Start and load SSH_AUTH_SOCK and SSH_AGENT_PID into GITHUB_ENV and outputs'
+
+inputs:
+  ssh-key:
+    description: SSH Private key contents string
+    required: True
+
+outputs:
+  SSH_AUTH_SOCK:
+    description: "SSH_AUTH_SOCK"
+    value: ${{ steps.start.outputs.SSH_AUTH_SOCK }}
+  SSH_AGENT_PID:
+    description: "SSH_AGENT_PID"
+    value: ${{ steps.start.outputs.SSH_AGENT_PID }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Start
+      id: start
+      shell: bash
+      run: |
+        eval "$(ssh-agent -s)"
+        echo "::add-mask::${{ inputs.ssh-key }}"
+        echo "::add-mask::${SSH_AUTH_SOCK}"
+        echo "::add-mask::${SSH_AGENT_PID}"
+        echo "${{ inputs.ssh-key }}" | ssh-add -
+        echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" | tee -a $GITHUB_ENV
+        echo "SSH_AGENT_PID=${SSH_AGENT_PID}" | tee -a $GITHUB_ENV
+        echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" | tee -a $GITHUB_OUTPUT
+        echo "SSH_AGENT_PID=${SSH_AGENT_PID}" | tee -a $GITHUB_OUTPUT

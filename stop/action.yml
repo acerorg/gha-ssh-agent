@@ -1,0 +1,15 @@
+name: 'SSH Agent Stop/Kill'
+description: 'Killing and/or stopping the SSH Agent for SSH_AUTH_SOCK and SSH_AGENT_PID, and clean GITHUB_ENV'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Stop
+      shell: bash
+      run: |
+        echo "::add-mask::${SSH_AUTH_SOCK}"
+        echo "::add-mask::${SSH_AGENT_PID}"
+        ssh-add -D
+        ssh-agent -k
+        echo "SSH_AUTH_SOCK=''" >> $GITHUB_ENV
+        echo "SSH_AGENT_PID=''" >> $GITHUB_ENV
