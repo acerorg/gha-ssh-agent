@@ -8,11 +8,9 @@ on:
         description: The tag or reference to use
         required: true
       main_version:
-        type: choice
+        required: true
         description: The main version to update
         default: v0
-        options:
-          - v0
 
 jobs:
   tag:
