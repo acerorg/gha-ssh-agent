@@ -11,5 +11,6 @@
 
 ```yml
 - name: Kill ssh agent
+  if: always()
   uses: acerorg/gha-ssh-agent/stop@v0
 ```
