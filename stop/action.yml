@@ -7,8 +7,6 @@ runs:
     - name: Stop
       shell: bash
       run: |
-        echo "::add-mask::${SSH_AUTH_SOCK}"
-        echo "::add-mask::${SSH_AGENT_PID}"
         ssh-add -D
         ssh-agent -k
         echo "SSH_AUTH_SOCK=''" >> $GITHUB_ENV
