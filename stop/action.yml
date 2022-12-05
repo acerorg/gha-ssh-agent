@@ -5,9 +5,12 @@ runs:
   using: "composite"
   steps:
     - name: Stop
+      if: env.SSH_AUTH_SOCK != '' && env.SSH_AGENT_PID != ''
       shell: bash
       run: |
-        ssh-add -D
-        ssh-agent -k
+        if [ -n "$SSH_AUTH_SOCK" ] ; then
+          ssh-add -D
+          ssh-agent -k
+        fi
         echo "SSH_AUTH_SOCK=''" >> $GITHUB_ENV
         echo "SSH_AGENT_PID=''" >> $GITHUB_ENV
